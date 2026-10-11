@@ -139,6 +139,7 @@ function localReply(prompt){
  if(p.includes('thank')) return 'You’re welcome! Feel free to ask me anything else.';
  return 'Thanks for your message! SASTRA is currently running in preview mode, so this reply is a sample rather than a response from a live AI model. To enable real AI answers, deploy the site with a secure server-side AI API connection. Your API key should never be placed in this HTML file.';
 }
+  window.SASTRA_API_ENDPOINT = "https://autumn-wildflower-4c73.vikas191210076.workers.dev";
 async function sendMessage(){
  const input=$('messageInput'),text=input.value.trim();if(!text||busy)return;
  busy=true;input.value='';input.style.height='auto';addMessage(text,'user');chatCount++;localStorage.setItem('sastra-chat-count',String(chatCount));
