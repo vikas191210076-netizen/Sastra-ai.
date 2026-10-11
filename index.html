@@ -151,8 +151,9 @@ async function sendMessage(){
      if(!res.ok) throw new Error('AI service unavailable');
      const data=await res.json();pending.textContent=data.reply||data.message||'No response received.';
    } else {await new Promise(r=>setTimeout(r,450));pending.textContent=localReply(text);}
- }catch(e){pending.textContent='Sorry, the AI service could not respond. Check the server connection and try again.';}
- busy=false;$('sendBtn').disabled=false;input.focus();
+ }catch(e){
+    console.error('SASTRA AI error:', e);
+    pending.textContent='Sorry, the AI service could not respond. Please check the browser console for details.';
 }
 $('startChat').onclick=()=>showScreen('chat');$('homeSettings').onclick=()=>showScreen('settings');$('topSettings').onclick=()=>showScreen('settings');$('chatSettings').onclick=()=>showScreen('settings');$('backHome').onclick=()=>showScreen('home');$('homeFromChat').onclick=()=>showScreen('home');
 $('sendBtn').onclick=sendMessage;$('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
