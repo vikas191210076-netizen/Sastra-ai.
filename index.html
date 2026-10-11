@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1020">
+<title>SASTRA — AI Chat</title>
+<style>
+:root{--bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#697386;--line:#e5e9f2;--accent:#635bff;--accent2:#817bff;--bubble:#f0f1ff;--shadow:0 18px 55px rgba(28,35,70,.10)}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:.2s}
+body.dark{--bg:#090d18;--panel:#111827;--text:#f2f5ff;--muted:#9ba6bd;--line:#263044;--bubble:#202443;--shadow:0 18px 55px rgba(0,0,0,.25)}
+button,input,textarea{font:inherit}button{cursor:pointer}
+.app{min-height:100vh;display:flex;flex-direction:column}
+.topbar{height:72px;padding:0 clamp(16px,4vw,54px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:var(--panel)}
+.brand{display:flex;align-items:center;gap:11px;font-weight:850;letter-spacing:1.7px;font-size:19px}
+.logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#655dff,#a49fff);display:grid;place-items:center;color:white;font-weight:900;box-shadow:0 6px 18px #635bff44}
+.top-actions{display:flex;align-items:center;gap:10px}.pill{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:9px 13px;border-radius:999px;font-size:13px}
+main{width:min(100%,1050px);margin:0 auto;padding:clamp(20px,5vw,56px) 18px;flex:1}
+.screen{display:none}.screen.active{display:block}
+.hero{text-align:center;padding:clamp(24px,8vh,80px) 0 30px}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:var(--panel);padding:7px 12px;border-radius:999px;color:var(--muted);font-size:12px;font-weight:650}
+.dot{width:7px;height:7px;background:#28c88a;border-radius:50%}
+h1{font-size:clamp(40px,7vw,70px);line-height:1.04;letter-spacing:-2.8px;margin:24px 0 16px}
+.gradient{background:linear-gradient(100deg,#655dff,#b36aff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{max-width:560px;margin:0 auto;color:var(--muted);font-size:17px;line-height:1.7}
+.actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:30px}
+.primary,.secondary{border:0;border-radius:13px;padding:14px 20px;font-weight:750;display:inline-flex;align-items:center;gap:10px}
+.primary{background:var(--accent);color:white;box-shadow:0 8px 22px #635bff3b}.primary:hover{background:#5149ef;transform:translateY(-1px)}
+.secondary{background:var(--panel);border:1px solid var(--line);color:var(--text)}
+.feature-row{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin:38px auto 0;max-width:780px}
+.feature{border:1px solid var(--line);background:var(--panel);border-radius:17px;padding:19px;text-align:left}
+.feature-icon{font-size:21px}.feature strong{display:block;margin:11px 0 5px;font-size:14px}.feature span{font-size:12px;line-height:1.5;color:var(--muted)}
+.chat-shell{border:1px solid var(--line);background:var(--panel);border-radius:23px;overflow:hidden;box-shadow:var(--shadow);min-height:68vh;display:flex;flex-direction:column}
+.chat-head{padding:18px 21px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.chat-title{font-weight:800}.sub{color:var(--muted);font-size:12px;margin-top:3px}
+.messages{flex:1;padding:24px;display:flex;flex-direction:column;gap:18px;overflow:auto;max-height:55vh}
+.message{display:flex;gap:10px;max-width:88%;align-items:flex-start}.message.user{align-self:flex-end;flex-direction:row-reverse}
+.avatar{width:30px;height:30px;flex:0 0 30px;border-radius:10px;background:linear-gradient(135deg,#655dff,#a49fff);display:grid;place-items:center;color:white;font-size:12px;font-weight:800}
+.user .avatar{background:#dce2f2;color:#34405a}.bubble{background:var(--bubble);border-radius:4px 15px 15px 15px;padding:13px 15px;line-height:1.6;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}.user .bubble{background:var(--accent);color:white;border-radius:15px 4px 15px 15px}
+.composer-wrap{padding:15px 18px 18px;border-top:1px solid var(--line)}.composer{display:flex;gap:10px;align-items:flex-end;border:1px solid var(--line);border-radius:16px;padding:9px;background:var(--bg)}
+textarea{flex:1;resize:none;border:0;outline:0;background:transparent;color:var(--text);padding:9px;max-height:130px;min-height:42px}
+.send{width:42px;height:42px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-size:18px}.hint{text-align:center;color:var(--muted);font-size:11px;margin-top:9px}
+.panel{max-width:650px;margin:18px auto;border:1px solid var(--line);border-radius:22px;background:var(--panel);box-shadow:var(--shadow);padding:clamp(20px,4vw,34px)}
+.panel h2{margin:0 0 7px;font-size:27px;letter-spacing:-.7px}.panel-intro{color:var(--muted);font-size:14px;line-height:1.6;margin:0 0 26px}
+.setting{padding:18px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:20px}.setting:first-of-type{border-top:0}.setting strong{display:block;font-size:14px}.setting small{display:block;color:var(--muted);font-size:12px;margin-top:5px;line-height:1.4}
+.segment{display:flex;border:1px solid var(--line);border-radius:11px;padding:4px;gap:3px;background:var(--bg)}.segment button{border:0;background:transparent;color:var(--muted);padding:8px 10px;border-radius:8px;font-size:12px;font-weight:700}.segment button.selected{background:var(--accent);color:#fff}
+.stars{display:flex;gap:7px}.stars button{border:0;background:transparent;color:#c7cddd;font-size:27px;padding:0}.stars button.active{color:#f4b740}
+.input{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--text);outline:none;margin:8px 0 13px}.input:focus{border-color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:22px 0}.stat{border:1px solid var(--line);border-radius:14px;padding:17px}.stat span{display:block;color:var(--muted);font-size:12px}.stat strong{display:block;font-size:29px;margin-top:8px}.rating-list{display:grid;gap:10px}.rating-row{display:grid;grid-template-columns:55px 1fr 30px;align-items:center;gap:10px;font-size:13px}.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}.bar i{height:100%;display:block;background:linear-gradient(90deg,#655dff,#b36aff);border-radius:99px}
+.notice{background:color-mix(in srgb,#f4b740 13%,var(--panel));border:1px solid color-mix(in srgb,#f4b740 38%,var(--line));padding:12px 14px;border-radius:12px;color:var(--muted);font-size:12px;line-height:1.5;margin:14px 0}
+.footer{text-align:center;color:var(--muted);font-size:11px;padding:20px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#172033;color:#fff;padding:12px 16px;border-radius:12px;font-size:13px;box-shadow:var(--shadow);display:none;z-index:9}
+@media(max-width:600px){.feature-row{grid-template-columns:1fr}.feature{display:flex;gap:13px;align-items:center}.feature strong{margin:0 0 4px}.feature-icon{font-size:24px}.topbar{height:62px}.top-actions .pill{padding:8px 10px}.message{max-width:96%}.messages{padding:16px}.setting{align-items:flex-start;flex-direction:column;gap:12px}.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="logo">S</div><span>SASTRA</span></div>
+  <div class="top-actions">
+    <button class="pill" id="guestBadge">◉ Guest</button>
+    <button class="pill" id="topSettings">⚙ Settings</button>
+  </div>
+</header>
+<main>
+<section class="screen active" id="home">
+  <div class="hero">
+    <div class="eyebrow"><span class="dot"></span> Your AI conversation space</div>
+    <h1>Ideas begin with<br><span class="gradient">a conversation.</span></h1>
+    <p class="lead">Meet SASTRA — a simple space to ask questions, explore ideas, and get help with your next big thing.</p>
+    <div class="actions"><button class="primary" id="startChat">Let's Talk <span>→</span></button><button class="secondary" id="homeSettings">⚙ Settings</button></div>
+    <div class="feature-row">
+      <div class="feature"><div class="feature-icon">✦</div><div><strong>Helpful answers</strong><span>Ask questions and explore new ideas.</span></div></div>
+      <div class="feature"><div class="feature-icon">◷</div><div><strong>Guest access</strong><span>Start without a Google account.</span></div></div>
+      <div class="feature"><div class="feature-icon">☼</div><div><strong>Your style</strong><span>Choose a theme and response tone.</span></div></div>
+    </div>
+  </div>
+</section>
+<section class="screen" id="chat">
+  <div class="chat-shell">
+    <div class="chat-head"><div><div class="chat-title">Let's Talk</div><div class="sub">Chatting as Guest · SASTRA AI</div></div><button class="pill" id="clearChat">＋ New chat</button></div>
+    <div class="messages" id="messages"><div class="message"><div class="avatar">S</div><div class="bubble">Hi! I'm SASTRA. What would you like to talk about today?</div></div></div>
+    <div class="composer-wrap"><div class="composer"><textarea id="messageInput" rows="1" placeholder="Message SASTRA…"></textarea><button class="send" id="sendBtn" aria-label="Send message">↑</button></div><div class="hint">AI can make mistakes. Check important information.</div></div>
+  </div>
+  <div class="actions"><button class="secondary" id="chatSettings">⚙ Settings</button><button class="secondary" id="homeFromChat">← Home</button></div>
+</section>
+<section class="screen" id="settings">
+  <div class="panel">
+    <h2>Settings</h2><p class="panel-intro">Make SASTRA feel right for you. Your preferences are saved in this browser.</p>
+    <div class="setting"><div><strong>Response style</strong><small>Choose how SASTRA communicates.</small></div><div class="segment"><button id="normalBtn">Normal</button><button id="professionalBtn">Professional</button></div></div>
+    <div class="setting"><div><strong>Theme</strong><small>Choose a light or dark appearance.</small></div><div class="segment"><button id="lightBtn">☼ White</button><button id="darkBtn">☾ Black</button></div></div>
+    <div class="setting"><div><strong>Rate SASTRA</strong><small>How was your experience? Choose 1–5 stars.</small></div><div class="stars" id="stars"><button data-rating="1" aria-label="1 star">★</button><button data-rating="2" aria-label="2 stars">★</button><button data-rating="3" aria-label="3 stars">★</button><button data-rating="4" aria-label="4 stars">★</button><button data-rating="5" aria-label="5 stars">★</button></div></div>
+    <div class="notice">Prototype note: ratings and chat counts are stored only in this browser. They are not yet shared with the developer dashboard across all users.</div>
+    <div class="actions" style="justify-content:flex-start"><button class="primary" id="saveSettings">Save settings</button><button class="secondary" id="backHome">← Back</button></div>
+  </div>
+</section>
+<section class="screen" id="admin">
+  <div class="panel">
+    <h2>Developer dashboard</h2><p class="panel-intro">Private analytics preview for the SASTRA developer.</p>
+    <div id="loginArea">
+      <div class="notice">Demo access only. Set a real server-side admin login before publishing this dashboard. A password stored in front-end code is not secure.</div>
+      <label for="adminPassword"><strong>Demo password</strong></label><input class="input" type="password" id="adminPassword" placeholder="Enter demo password">
+      <button class="primary" id="adminLogin">Unlock demo</button>
+      <p class="sub">Demo password: <b>sastra-demo</b></p>
+    </div>
+    <div id="statsArea" style="display:none">
+      <div class="stats"><div class="stat"><span>Chat sessions on this browser</span><strong id="totalChats">0</strong></div><div class="stat"><span>Ratings submitted here</span><strong id="totalRatings">0</strong></div></div>
+      <h3>Rating distribution</h3><div class="rating-list" id="ratingList"></div>
+      <div class="notice">These are local demo statistics from this browser only, not total users across the internet. A database and protected backend are required for real multi-user analytics.</div>
+      <button class="secondary" id="adminLogout">Lock dashboard</button>
+    </div>
+    <div class="actions" style="justify-content:flex-start"><button class="secondary" id="adminBack">← Back to SASTRA</button></div>
+  </div>
+</section>
+</main>
+<footer class="footer">SASTRA · A simple space for curious minds</footer>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $ = id => document.getElementById(id);
+const state = {style:localStorage.getItem('sastra-style')||'normal',theme:localStorage.getItem('sastra-theme')||'light',rating:Number(localStorage.getItem('sastra-rating')||0)};
+let chatCount = Number(localStorage.getItem('sastra-chat-count')||0);
+let ratingHistory = JSON.parse(localStorage.getItem('sastra-rating-history')||'[]');
+let busy = false;
+function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(name).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});if(name==='settings')renderSettings();if(name==='admin')renderStats();}
+function toast(msg){$('toast').textContent=msg;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2600)}
+function applyPrefs(){document.body.classList.toggle('dark',state.theme==='dark');}
+function renderSettings(){
+  $('normalBtn').classList.toggle('selected',state.style==='normal');$('professionalBtn').classList.toggle('selected',state.style==='professional');
+  $('lightBtn').classList.toggle('selected',state.theme==='light');$('darkBtn').classList.toggle('selected',state.theme==='dark');
+  document.querySelectorAll('#stars button').forEach(b=>b.classList.toggle('active',Number(b.dataset.rating)<=state.rating));
+}
+function addMessage(text,who='bot'){const wrap=document.createElement('div');wrap.className='message '+(who==='user'?'user':'');const av=document.createElement('div');av.className='avatar';av.textContent=who==='user'?'G':'S';const bub=document.createElement('div');bub.className='bubble';bub.textContent=text;wrap.append(av,bub);$('messages').append(wrap);$('messages').scrollTop=$('messages').scrollHeight;return bub}
+function localReply(prompt){
+ const p=prompt.toLowerCase();
+ if(/hello|hi\b|hey/.test(p)) return 'Hello! What can I help you with today?';
+ if(p.includes('who are you')) return 'I’m SASTRA, an AI chat experience. Once an AI provider is connected, I can answer a much wider range of questions.';
+ if(p.includes('html')) return 'HTML structures a webpage, CSS styles it, and JavaScript adds interactive behavior. What are you trying to build?';
+ if(p.includes('thank')) return 'You’re welcome! Feel free to ask me anything else.';
+ return 'Thanks for your message! SASTRA is currently running in preview mode, so this reply is a sample rather than a response from a live AI model. To enable real AI answers, deploy the site with a secure server-side AI API connection. Your API key should never be placed in this HTML file.';
+}
+async function sendMessage(){
+ const input=$('messageInput'),text=input.value.trim();if(!text||busy)return;
+ busy=true;input.value='';input.style.height='auto';addMessage(text,'user');chatCount++;localStorage.setItem('sastra-chat-count',String(chatCount));
+ const pending=addMessage('SASTRA is thinking…');$('sendBtn').disabled=true;
+ // Secure live AI integration can be enabled by configuring a server endpoint and setting window.SASTRA_API_ENDPOINT.
+ try{
+   if(window.SASTRA_API_ENDPOINT){
+     const res=await fetch(window.SASTRA_API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,style:state.style})});
+     if(!res.ok) throw new Error('AI service unavailable');
+     const data=await res.json();pending.textContent=data.reply||data.message||'No response received.';
+   } else {await new Promise(r=>setTimeout(r,450));pending.textContent=localReply(text);}
+ }catch(e){pending.textContent='Sorry, the AI service could not respond. Check the server connection and try again.';}
+ busy=false;$('sendBtn').disabled=false;input.focus();
+}
+$('startChat').onclick=()=>showScreen('chat');$('homeSettings').onclick=()=>showScreen('settings');$('topSettings').onclick=()=>showScreen('settings');$('chatSettings').onclick=()=>showScreen('settings');$('backHome').onclick=()=>showScreen('home');$('homeFromChat').onclick=()=>showScreen('home');
+$('sendBtn').onclick=sendMessage;$('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
+$('messageInput').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,130)+'px'});
+$('clearChat').onclick=()=>{ $('messages').innerHTML='';addMessage('New conversation started. What would you like to explore?');toast('New chat started');};
+$('normalBtn').onclick=()=>{state.style='normal';renderSettings()};$('professionalBtn').onclick=()=>{state.style='professional';renderSettings()};
+$('lightBtn').onclick=()=>{state.theme='light';applyPrefs();renderSettings()};$('darkBtn').onclick=()=>{state.theme='dark';applyPrefs();renderSettings()};
+document.querySelectorAll('#stars button').forEach(b=>b.onclick=()=>{state.rating=Number(b.dataset.rating);renderSettings()});
+$('saveSettings').onclick=()=>{localStorage.setItem('sastra-style',state.style);localStorage.setItem('sastra-theme',state.theme);if(state.rating){localStorage.setItem('sastra-rating',String(state.rating));ratingHistory.push(state.rating);localStorage.setItem('sastra-rating-history',JSON.stringify(ratingHistory));}applyPrefs();toast('Settings saved');};
+function renderStats(){ $('totalChats').textContent=chatCount;$('totalRatings').textContent=ratingHistory.length;const list=$('ratingList');list.innerHTML='';for(let n=5;n>=1;n--){const count=ratingHistory.filter(x=>x===n).length;const row=document.createElement('div');row.className='rating-row';row.innerHTML=`<span>${n} star${n===1?'':'s'}</span><div class="bar"><i style="width:${ratingHistory.length?count/ratingHistory.length*100:0}%"></i></div><b>${count}</b>`;list.append(row)}}
+$('adminLogin').onclick=()=>{if($('adminPassword').value==='sastra-demo'){$('loginArea').style.display='none';$('statsArea').style.display='block';renderStats();toast('Demo dashboard unlocked')}else toast('Incorrect demo password')};
+$('adminLogout').onclick=()=>{$('loginArea').style.display='block';$('statsArea').style.display='none';$('adminPassword').value='';};
+$('adminBack').onclick=()=>showScreen('home');
+applyPrefs();renderSettings();
+// Developer preview shortcut: open with #developer to reach the demo dashboard.
+if(location.hash==='#developer')showScreen('admin');
+</script>
+</body>
+</html>
